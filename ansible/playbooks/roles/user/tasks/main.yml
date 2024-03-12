@@ -1,0 +1,27 @@
+---
+- name: log
+  debug:
+    msg: "Creation de {{ username }}"
+
+- name: nouvel utilisateur
+  when: username is defined
+  user:
+      name: "{{ username }}"
+      comment: ""
+      shell: /usr/bin/zsh
+      generate_ssh_key: yes
+
+- name: Clé SSh
+  when: username is defined
+  authorized_key:
+      user: "{{ username }}"
+      key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+- name: "{{ username }} devient sudoers"
+  when: username is defined
+  template:
+      src: ../templates/sudoers.j2
+      dest: "/etc/sudoers.d/{{ username }}-sudoer"
+      validate: 'visudo -cf %s'
+      force: no
+      backup: yes

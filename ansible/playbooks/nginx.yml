@@ -1,0 +1,23 @@
+---
+- hosts: all
+  vars:
+    hello: "Bonjour et bienvenue"
+  tasks:
+
+    - name: Installer nginx
+      apt:
+        name: nginx
+        state: latest
+        update_cache: yes
+
+    - name: copier le template
+      template:
+        src: ../templates/index.html.j2
+        dest: /var/www/html/index.html 
+        force: no
+        backup: yes
+
+    - name: redemarrer nginx
+      service: 
+        name: nginx
+        state: restarted

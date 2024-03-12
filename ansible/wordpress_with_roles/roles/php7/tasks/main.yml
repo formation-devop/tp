@@ -1,0 +1,40 @@
+---
+- name: update cache before install php7
+  apt: update_cache=yes
+
+- name: Add dependencies for PHP versions (Debian).
+  apt:
+    name: "{{ item }}"
+  loop:
+    - apt-transport-https
+    - ca-certificates
+
+- name: Add Ondrej Sury's apt key (Debian).
+  apt_key:
+    url: https://packages.sury.org/php/apt.gpg
+    state: present
+
+- name: Add Ondrej Sury's repo (Debian).
+  apt_repository:
+    repo: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
+    state: present
+  register: php_ondrej_debian_repo
+
+- name: update cache after install repo
+  apt: update_cache=yes
+
+- name: Install PHP Packages
+  apt: 
+    name: "{{ item }}" 
+    state: latest
+  with_items: "{{ php_packages }}"
+  when: php_packages is defined
+  notify:
+    - restart php7-fpm
+
+- name: Remove apache2
+  apt: 
+    name: apache2 
+    state: absent
+  notify:
+    - restart php7-fpm

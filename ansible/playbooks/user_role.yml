@@ -1,0 +1,7 @@
+---
+- name: Création d'un nouvel utilisateur
+  hosts: web
+  remote_user: root
+  roles:
+     - utils
+     - user

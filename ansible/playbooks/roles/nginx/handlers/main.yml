@@ -1,0 +1,12 @@
+---
+- name: nginx start
+  become: yes
+  service:
+      name: nginx
+      state: started
+
+- name: nginx reload
+  become: yes
+  service:
+      name: nginx
+      state: reloaded

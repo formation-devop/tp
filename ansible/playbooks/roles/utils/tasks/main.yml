@@ -1,0 +1,9 @@
+---
+- name: uilitaires
+  apt:
+    name: "{{item}}"
+    update_cache: yes
+  loop:
+    - zsh
+    - htop
+    - sudo

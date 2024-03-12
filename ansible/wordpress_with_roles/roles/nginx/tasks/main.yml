@@ -1,0 +1,92 @@
+---
+# - name: Add nginx (Debian).
+#   apt_key:
+#     url: "deb http://nginx.org/packages/mainline/debian/ stretch nginx"
+#     state: present
+#   when: ansible_distribution == "Debian"
+
+# - name: Add nginx apt key (Debian).
+#   apt_key:
+#     url: http://nginx.org/keys/nginx_signing.key
+#     state: present
+#   when: ansible_distribution == "Debian"
+
+# - name: Update apt
+# #   apt: update_cache=yes
+# - name: hostname
+#   debug:
+#     msg: "System {{hostvars[item].ansible_hostname}}"
+#   with_items: "{{ groups.all }}"
+
+- name: install nginx
+  apt:
+    name: nginx
+    state: latest
+    update_cache: yes
+
+- name: backup du fichier default dans sites-enabled
+  copy: 
+    src: "{{item}}"
+    dest: /etc/nginx/sites-enabled/default.{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}
+    remote_src: yes
+  with_fileglob: "/etc/nginx/sites-enabled/default"
+
+- name: backup du fichier default dans 
+  copy: 
+    src: "{{item}}"
+    dest: /etc/nginx/sites-available/default.{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}
+    remote_src: yes
+  with_fileglob: "/etc/nginx/sites-available/default"
+
+- name: Create nginx config
+  template: 
+    src: default.j2 
+    dest: /etc/nginx/sites-available/default
+
+- name: "Create christaline wordpress folder with index"
+  block: 
+    - name: directory
+      file:
+        path: "{{christaline_root_folder}}"
+        state: directory
+        mode: 0755
+        recurse: yes
+    - name: index file
+      template: src=index.php dest="{{christaline_root_folder}}"
+      notify: restart nginx
+    - name: Add IP address into /etc/hosts
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ hostvars[item].ansible_host }} {{ christaline_server_name }}"
+        state: present
+      when: hostvars[item].ansible_hostname == 'cristaline'
+      with_items: "{{ groups.all }}"
+  when: inventory_hostname == 'cristaline'
+
+
+- name: "Create evian wordpress folder with index"
+  block: 
+    - name: directory
+      file:
+        path: "{{evian_root_folder}}"
+        state: directory
+        mode: 0755
+        recurse: yes
+    - name: index file
+      template: src=index.php dest="{{evian_root_folder}}"
+      notify: restart nginx
+    - name: Add IP address into /etc/hosts
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ hostvars[item].ansible_host }} {{evian_server_name }}"
+        state: present
+      when: hostvars[item].ansible_hostname == 'evian'
+      with_items: "{{ groups.all }}"
+  when: inventory_hostname == 'evian'
+
+
+- name: restart nginx
+  service: name=nginx state=restarted
+  tags:
+    restart_nginx
+

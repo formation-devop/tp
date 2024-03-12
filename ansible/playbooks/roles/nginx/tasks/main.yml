@@ -1,0 +1,11 @@
+---
+- name: installation nginx
+  become: yes
+  apt:
+      name: nginx
+      state: latest
+  notify: nginx start
+
+- name: backup du fichier default
+  command: mv /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/default.{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}
+  notify: nginx reload

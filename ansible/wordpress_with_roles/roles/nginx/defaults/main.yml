@@ -1,0 +1,4 @@
+christaline_server_name: cristaline.wordpress.local
+christaline_root_folder: /var/www/christaline.wordpress.com
+evian_server_name: evian.wordpress.local
+evian_root_folder: /var/www/evian.wordpress.com

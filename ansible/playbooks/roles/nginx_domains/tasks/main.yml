@@ -1,0 +1,4 @@
+---
+- name: Creation des sites
+  include: sites.yml
+  loop: "{{ domaines }}"

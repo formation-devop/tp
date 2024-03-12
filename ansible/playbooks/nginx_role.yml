@@ -1,0 +1,8 @@
+---
+- name: Installation nginx
+  remote_user: root
+  hosts: web
+  become: yes
+  tasks:
+  - include_role:
+        name: nginx

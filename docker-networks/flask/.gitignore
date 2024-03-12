@@ -1,0 +1,7 @@
+venv
+.idea
+*.pyc
+*.png
+Dockerfile
+docker-compose.yml
+nginx.conf

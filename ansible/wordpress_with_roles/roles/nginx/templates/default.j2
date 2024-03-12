@@ -1,0 +1,55 @@
+upstream php {
+	server unix:/run/php/php7.1-fpm.sock;
+}
+
+server {
+
+	{% if inventory_hostname == 'cristaline' %}
+		server_name {{christaline_server_name}};
+		root  {{christaline_root_folder}};
+	{% else %}
+		server_name {{evian_server_name}};
+		root  {{evian_root_folder}};
+	{% endif %}
+
+	
+	index index.php;
+	
+	location = /favicon.ico {
+		log_not_found off;
+		access_log off;
+	}
+	
+	location = /robots.txt {
+		allow all;
+		log_not_found off;
+		access_log off;
+	}
+	
+	location ~ /\. {
+		deny all;
+	}
+
+
+	location ~* /(?:uploads|files)/.*\.php$ {
+		deny all;
+	}
+
+	location / {
+		try_files $uri $uri/ /index.php?$args;
+	}
+
+	rewrite /wp-admin$ $scheme://$host$uri/ permanent;
+
+
+	location ~ [^/]\.php(/|$) {
+		fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+		if (!-f $document_root$fastcgi_script_name) {
+			return 404;
+		}
+		include fastcgi_params;
+		fastcgi_index index.php;
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_pass php;
+	}
+}

@@ -1,0 +1,19 @@
+---
+- name: Installation wordpress
+  hosts: web
+  tasks:
+    - name: Make sure we can connect
+      ping:
+
+    - name: Installation php
+      include_role: 
+        name: php7
+
+    - name: Installation mysql
+      include_role: 
+        name: mysql
+   
+    - name: install nginx
+      apt:
+        name: nginx
+        state: latest

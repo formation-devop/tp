@@ -1,0 +1,33 @@
+---
+- name: remove dotdeb
+  command: rm -f /etc/apt/sources.list.d/packages_dotdeb_org.list
+
+- name: Update apt
+  apt: update_cache=yes
+
+- name: Add nginx (Debian).
+  apt_key:
+    url: "deb http://nginx.org/packages/mainline/debian/ stretch nginx"
+    state: present
+  when: ansible_distribution == "Debian"
+
+
+- name: Add nginx apt key (Debian).
+  apt_key:
+    url: http://nginx.org/keys/nginx_signing.key
+    state: present
+  when: ansible_distribution == "Debian"
+
+- name: Update apt
+  apt: update_cache=yes
+
+- name: install nginx
+  apt:
+    name: nginx
+    state: latest
+    update_cache: yes
+
+- name: backup du fichier default
+  command: mv /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/default.{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}
+  notify: nginx reload
+  

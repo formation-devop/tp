@@ -1,0 +1,21 @@
+---
+- name: Serveur
+  debug:
+    msg: "System {{ inventory_hostname }}"
+
+- name: creation du répertoire
+  file:
+    path: "/var/www/{{ item }}"
+    state: directory
+
+- name: copie du fichier index html
+  copy:
+    src: ../files/index.html
+    dest: "/var/www/{{ item }}/index.html"
+  # when: inventory_hostname == 'html'
+
+- name: copie du fichier index php
+  copy:
+    src: ../files/index.php
+    dest: "/var/www/{{ item }}/index.php"
+  # when: inventory_hostname == 'php'

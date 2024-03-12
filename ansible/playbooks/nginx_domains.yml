@@ -1,0 +1,6 @@
+---
+- name: domaines nginx
+  hosts: web
+  tasks:
+  - include_role:
+      name: nginx_domains

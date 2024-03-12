@@ -1,0 +1,19 @@
+---
+- name: install wordpress
+  hosts: all
+  tasks:
+    - name: check that we can connect
+      ping:
+
+    - name: play php role
+      include_role:
+        name: php7
+
+    - name: play mysql role
+      include_role:
+        name: mysql
+
+    - name: play nginx role
+      include_role:
+        name: nginx
+      tags: always

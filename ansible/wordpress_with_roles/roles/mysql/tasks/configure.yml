@@ -1,0 +1,37 @@
+---
+
+- name: Get MySQL version.
+  command: 'mysql --version'
+  register: mysql_cli_version
+
+- name: Generate new root password
+  command: openssl rand -hex 7
+  register: mysql_new_root_pass
+
+- name: Update root password
+  mysql_user: name={{mysql_root_username}} host={{item}} password={{mysql_root_password}}
+  loop:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+
+- name: Output new root password
+  debug: msg="New root password is {{mysql_new_root_pass.stdout}}"
+
+- name: Copy my.cnf global MySQL configuration.
+  template:
+    src: my.cnf.j2
+    dest: "{{ mysql_config_file }}"
+    owner: root
+    group: root
+    mode: 0644
+    force: "{{ overwrite_global_mycnf }}"
+  notify: restart mysql
+
+- name: Remove anonymous users
+  mysql_user: name="" state=absent
+
+- name: Remove test database
+  mysql_db: name=test state=absent
+

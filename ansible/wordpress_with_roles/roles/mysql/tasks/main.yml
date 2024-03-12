@@ -1,0 +1,8 @@
+---
+# Variable configuration.
+- include_tasks: variables.yml
+
+- name: Install MySQL on debian
+  include_tasks: setup-Debian.yml
+
+- include_tasks: configure.yml
